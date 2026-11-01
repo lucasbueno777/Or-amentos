@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#153b61">
+  <title>Orçamentos | Mar e Lua</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-content">
+      <div class="brand">
+        <img class="brand-logo" src="logo-mar-e-lua.png" alt="Logo Mar e Lua">
+        <div class="brand-text">
+          <span class="brand-name">MAR E LUA</span>
+          <span class="brand-subtitle">A força do mar e a sabedoria da lua em harmonia.</span>
+        </div>
+      </div>
+      <span class="header-label">GERADOR DE ORÇAMENTOS</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="welcome">
+      <span class="eyebrow">MAR E LUA • ORÇAMENTOS</span>
+      <h1>Novo orçamento</h1>
+      <p>Escolha os produtos da loja e prepare um PDF com fotos para enviar ao cliente.</p>
+    </section>
+
+    <details class="logo-settings">
+      <summary><span class="logo-settings-icon">◉</span> Configurar logo da Mar e Lua</summary>
+      <div class="logo-settings-content">
+        <p>Escolha uma imagem PNG, JPG ou WebP da sua logo. Ela ficará guardada neste navegador e aparecerá no topo, no rodapé e no PDF do orçamento.</p>
+        <label class="logo-upload-label" for="logoUpload">Selecionar imagem da logo</label>
+        <input type="file" id="logoUpload" accept="image/png,image/jpeg,image/webp">
+        <p id="logoStatus" class="logo-status" role="status"></p>
+      </div>
+    </details>
+
+    <section class="panel">
+      <div class="section-heading">
+        <h2>Selecionar produtos</h2>
+        <span class="section-number">01</span>
+      </div>
+
+      <div class="field">
+        <label for="productSearch">Pesquisar na Nuvemshop</label>
+        <div class="search-area">
+          <input type="search" id="productSearch"
+            placeholder="Digite o nome do produto..." autocomplete="off">
+          <button id="searchButton" type="button">Buscar</button>
+        </div>
+      </div>
+      <div id="productResults" class="product-results" aria-live="polite">
+        <p class="empty-message">Pesquise um produto para consultar preço e estoque.</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <h2>Montar orçamento</h2>
+        <span class="section-number">02</span>
+      </div>
+
+      <div class="field customer-field">
+        <label for="customerName">Nome do cliente <span class="optional">(opcional)</span></label>
+        <input type="text" id="customerName" maxlength="120"
+          placeholder="Ex.: Maria Silva" autocomplete="name">
+      </div>
+
+      <div id="quoteItems" class="quote-items">
+        <p class="empty-message">Nenhum produto adicionado.</p>
+      </div>
+
+      <p class="discount-explanation">Atacado: escolha o desconto de cada produto separadamente, em reais ou porcentagem. Se estiver em zero, o preço permanece normal.</p>
+
+      <div class="totals">
+        <div class="total-line">
+          <span>Subtotal sem descontos</span>
+          <strong id="subtotal">R$ 0,00</strong>
+        </div>
+        <div class="total-line">
+          <span>Descontos dos produtos</span>
+          <strong id="discountValue">R$ 0,00</strong>
+        </div>
+        <div class="total-line grand-total">
+          <span>TOTAL DO ORÇAMENTO</span>
+          <strong id="grandTotal">R$ 0,00</strong>
+        </div>
+      </div>
+
+      <button id="generatePDF" class="pdf-button" type="button">
+        Baixar orçamento em PDF
+      </button>
+      <button id="sharePDF" class="share-button" type="button" hidden>Compartilhar PDF no WhatsApp ou outro aplicativo</button>
+      <p id="pdfStatus" class="pdf-status" role="status" aria-live="polite"></p>
+      <p class="privacy-note">O estoque aparece só para você e não entra no PDF do cliente.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <img class="brand-logo footer-logo" src="logo-mar-e-lua.png" alt="Logo Mar e Lua">
+      <strong>MAR E LUA</strong>
+      <span>A força do mar e a sabedoria da lua em harmonia.</span>
+      <small>artigosmarelua.com.br</small>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
