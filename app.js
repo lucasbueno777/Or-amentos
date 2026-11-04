@@ -420,6 +420,10 @@ function updateItemDiscount(key, field, value) {
   invalidatePreparedPDF();
 }
 
+function isManualItem(item) {
+  return String(item.key || "").startsWith("manual-") && item.productId == null;
+}
+
 function renderQuote() {
   quoteItems.replaceChildren();
   if (!quote.length) {
@@ -436,6 +440,7 @@ function renderQuote() {
           ${item.variantName ? `<p>${escapeHTML(item.variantName)}</p>` : ""}
           <small>${escapeHTML(stockLabel(item.stock))}</small>
           <p class="product-note">Preço cheio: ${money(item.price)} por unidade</p>
+          ${isManualItem(item) ? `<button type="button" class="edit-manual-button">Editar produto</button>` : ""}
         </div>
         <div class="quote-controls">
           <div class="quantity-controls">
@@ -469,7 +474,55 @@ function renderQuote() {
             <div class="line-total"><small>Total deste produto</small>${money(calc.total)}</div>
           </div>
         </div>
+        ${isManualItem(item) ? `<form class="manual-edit-form" hidden>
+          <h4>Editar produto manual</h4>
+          <label>Nome do produto<input class="edit-name" type="text" maxlength="300" required value="${escapeHTML(item.name)}"></label>
+          <div class="manual-edit-grid">
+            <label>Preço unitário (R$)<input class="edit-price" type="number" inputmode="decimal" min="0" step="0.01" required value="${item.price}"></label>
+            <label>Quantidade<input class="edit-quantity" type="number" min="1" max="9999" step="1" required value="${item.quantity}"></label>
+          </div>
+          <label>Trocar foto (opcional)<input class="edit-photo" type="file" accept="image/png,image/jpeg,image/webp"></label>
+          ${item.image ? `<label class="manual-remove-photo"><input class="edit-remove-photo" type="checkbox"> Remover foto atual</label>` : ""}
+          <div class="manual-edit-actions"><button type="submit" class="manual-edit-save">Salvar alterações</button><button type="button" class="manual-edit-cancel">Cancelar</button></div>
+          <p class="manual-edit-error" role="status"></p>
+        </form>` : ""}
       `;
+      if (isManualItem(item)) {
+        const editForm = line.querySelector(".manual-edit-form");
+        line.querySelector(".edit-manual-button").addEventListener("click", () => { editForm.hidden = !editForm.hidden; });
+        line.querySelector(".manual-edit-cancel").addEventListener("click", () => { editForm.hidden = true; });
+        editForm.addEventListener("submit", async event => {
+          event.preventDefault();
+          const error = editForm.querySelector(".manual-edit-error");
+          const save = editForm.querySelector(".manual-edit-save");
+          const name = editForm.querySelector(".edit-name").value.trim();
+          const price = Number(editForm.querySelector(".edit-price").value);
+          const quantity = Number(editForm.querySelector(".edit-quantity").value);
+          if (!name || !Number.isFinite(price) || price < 0 || !Number.isInteger(quantity) || quantity < 1 || quantity > 9999) {
+            error.textContent = "Informe nome, preço válido e quantidade entre 1 e 9999.";
+            return;
+          }
+          save.disabled = true;
+          error.textContent = "Salvando alterações...";
+          try {
+            const file = editForm.querySelector(".edit-photo").files?.[0];
+            const image = file ? await resizeManualPhoto(file) :
+              (editForm.querySelector(".edit-remove-photo")?.checked ? "" : item.image);
+            item.name = name;
+            item.price = Math.round(price * 100) / 100;
+            item.quantity = quantity;
+            item.image = image;
+            if (item.discountType === "amount") item.discountValue = Math.min(item.discountValue, item.price);
+            markQuoteChanged();
+            invalidatePreparedPDF();
+            renderQuote();
+            showProductToast(name);
+          } catch (e) {
+            error.textContent = e.message || "Não foi possível editar o produto.";
+            save.disabled = false;
+          }
+        });
+      }
       line.querySelector(".minus").onclick = () => changeQuantity(item.key, -1);
       line.querySelector(".plus").onclick = () => changeQuantity(item.key, 1);
       line.querySelector(".remove").onclick = () => removeProduct(item.key);
